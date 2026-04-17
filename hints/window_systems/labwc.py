@@ -23,13 +23,15 @@ class Labwc(WindowSystem):
     def _find_active_window(self) -> dict | None:
         """Find the active window using AT-SPI accessibility tree.
 
-        Iterates through all accessible applications and their windows
-        to find the one with the ACTIVE state, then extracts its screen
-        geometry, PID, and application name.
+        First tries to find a window with the ACTIVE state. If labwc
+        does not report ACTIVE (common on PiOS), falls back to the
+        largest SHOWING frame window that is not a panel or dock.
 
         :return: Dict with window info or None.
         """
         desktop = Atspi.get_desktop(0)
+        candidates: list[dict] = []
+
         for app_idx in range(desktop.get_child_count()):
             app = desktop.get_child_at_index(app_idx)
             if app is None:
@@ -40,19 +42,42 @@ class Labwc(WindowSystem):
                     continue
                 try:
                     state_set = window.get_state_set()
-                    if state_set and state_set.contains(Atspi.StateType.ACTIVE):
-                        extents = window.get_extents(Atspi.CoordType.SCREEN)
-                        return {
-                            "x": extents.x,
-                            "y": extents.y,
-                            "width": extents.width,
-                            "height": extents.height,
-                            "pid": window.get_process_id(),
-                            "name": app.get_name() or "",
-                        }
+                    if not state_set:
+                        continue
+
+                    extents = window.get_extents(Atspi.CoordType.SCREEN)
+                    info = {
+                        "x": extents.x,
+                        "y": extents.y,
+                        "width": extents.width,
+                        "height": extents.height,
+                        "pid": window.get_process_id(),
+                        "name": app.get_name() or "",
+                    }
+
+                    # Prefer window with ACTIVE state (works on some compositors)
+                    if state_set.contains(Atspi.StateType.ACTIVE):
+                        return info
+
+                    # Collect SHOWING frame windows as fallback candidates
+                    if (
+                        state_set.contains(Atspi.StateType.SHOWING)
+                        and window.get_role() == Atspi.Role.FRAME
+                        and extents.width > 0
+                        and extents.height > 0
+                    ):
+                        candidates.append(info)
                 except Exception:
                     continue
-        return None
+
+        if not candidates:
+            return None
+
+        # Pick the largest visible frame (by area), excluding panels/docks
+        candidates.sort(
+            key=lambda c: c["width"] * c["height"], reverse=True
+        )
+        return candidates[0]
 
     @property
     def window_system_name(self) -> str:

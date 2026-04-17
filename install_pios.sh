@@ -54,6 +54,7 @@ install_system_dependencies() {
     print_header "Installing Wayland dependencies"
     sudo apt install -y \
       libgtk-layer-shell0 \
+      gir1.2-gtklayershell-0.1 \
       grim
   fi
 }
