@@ -46,6 +46,16 @@ Run the install script:
 curl -fsSL https://raw.githubusercontent.com/AlfredoSequeida/hints/main/install.sh | bash
 ```
 
+### Raspberry Pi OS (PiOS)
+
+Hints supports Raspberry Pi (Pi 500+, Pi 5, Pi 4) running PiOS with **wayfire** (Bookworm), **labwc** (Trixie+), or **X11/openbox**.
+
+Run the dedicated PiOS install script:
+
+```
+curl -fsSL https://raw.githubusercontent.com/Caracore/hints/pios-support/install_pios.sh | bash
+```
+
 ## Setup
 
 1. To facilitate setup, hints ships with a setup script.
@@ -61,6 +71,22 @@ sudo env XDG_SESSION_TYPE=$XDG_SESSION_TYPE env XDG_CURRENT_DESKTOP=$XDG_CURRENT
 - [i3/sway](https://github.com/AlfredoSequeida/hints/wiki/Window-Manager-and-Desktop-Environment-Setup-Guide#setup-keyboard-shortcuts-1)
 - [Hyprland](https://github.com/AlfredoSequeida/hints/wiki/Window-Manager-and-Desktop-Environment-Setup-Guide#setup-keyboard-shortcuts-3)
 - [Gnome](https://github.com/AlfredoSequeida/hints/wiki/Window-Manager-and-Desktop-Environment-Setup-Guide#setup-keyboard-shortcuts-4)
+- Wayfire (PiOS): Add to `~/.config/wayfire.ini` under `[command]`:
+  ```ini
+  binding_hints = <super> KEY_J
+  command_hints = hints
+  binding_hints_scroll = <super> KEY_K
+  command_hints_scroll = hints -m scroll
+  ```
+- labwc (PiOS): Add to `~/.config/labwc/rc.xml` under `<keyboard>`:
+  ```xml
+  <keybind key="W-j">
+    <action name="Execute" command="hints" />
+  </keybind>
+  <keybind key="W-k">
+    <action name="Execute" command="hints -m scroll" />
+  </keybind>
+  ```
 
 > [!NOTE]  
 > If you still don't see any hints, the application you're testing could need a bit of extra setup. Please see the [Help,-hints-doesn't-work-with-X-application](https://github.com/AlfredoSequeida/hints/wiki/Help,-hints-doesn't-work-with-X-application) page in the wiki.

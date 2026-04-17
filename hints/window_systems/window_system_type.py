@@ -12,7 +12,9 @@ class WindowSystemType(Enum):
     WAYLAND = "wayland"
 
 
-SupportedWindowSystems = Literal["x11", "sway", "hyprland"]
+SupportedWindowSystems = Literal[
+    "x11", "sway", "hyprland", "plasmashell", "gnome-shell", "wayfire", "labwc"
+]
 
 
 def get_window_system_type() -> WindowSystemType:

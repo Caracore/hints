@@ -132,7 +132,7 @@ s = setup(
         "PyGObject==3.50.0",
         "pillow",
         "pyscreenshot",
-        "opencv-python",
+        "opencv-python-headless",
         "evdev",
         "dbus-python",
         "rich",

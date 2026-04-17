@@ -14,7 +14,8 @@ print_instruction_header() {
 install_dependencies_using_apt() {
   sudo apt update && \
   sudo apt install -y git libgirepository1.0-dev gcc libcairo2-dev pkg-config python3-dev gir1.2-gtk-4.0 cmake libdbus-1-dev && \
-  [ $XDG_SESSION_TYPE = "wayland" ] && sudo apt install -y libgtk-layer-shell0 grim
+  [ $XDG_SESSION_TYPE = "wayland" ] && sudo apt install -y libgtk-layer-shell0 grim && \
+  is_raspberry_pi && install_pios_extras
 }
 
 install_dependencies_using_pacman() {
@@ -29,6 +30,15 @@ install_dependencies_using_dnf() {
 }
 
 available() { command -v "${1:?}" >/dev/null; }
+
+is_raspberry_pi() {
+  [ -f /sys/firmware/devicetree/base/model ] && grep -qi "raspberry" /sys/firmware/devicetree/base/model 2>/dev/null
+}
+
+install_pios_extras() {
+  print_instruction_header "Installing PiOS/Raspberry Pi extras."
+  sudo apt install -y at-spi2-core python3-numpy
+}
 
 install_system_dependencies() {
   print_instruction_header "Installing system dependencies."
